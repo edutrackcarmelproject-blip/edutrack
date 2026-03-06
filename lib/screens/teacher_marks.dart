@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import '../services/api_service.dart';
 
 class TeacherMarks extends StatefulWidget {
   const TeacherMarks({super.key});
@@ -41,19 +40,13 @@ class _TeacherMarksState extends State<TeacherMarks> {
       };
     }).toList();
 
-    final response = await http.post(
-      Uri.parse("http://10.0.2.2:5000/api/marks"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "semester": selectedSemester,
-        "subject": selectedSubject,
-        "marksList": marksList
-      }),
+    final ok = await ApiService.saveMarks(
+      semester: selectedSemester,
+      subject: selectedSubject,
+      marksList: marksList,
     );
 
-    print(response.body);
-
-    if (response.statusCode == 200) {
+    if (ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Marks saved successfully")),
       );

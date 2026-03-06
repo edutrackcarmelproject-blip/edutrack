@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import '../services/api_service.dart';
 
 class TeacherUploadAssignment extends StatefulWidget {
   const TeacherUploadAssignment({super.key});
@@ -40,17 +39,10 @@ class _TeacherUploadAssignmentState extends State<TeacherUploadAssignment> {
   // 🔥 FETCH ASSIGNMENTS FROM BACKEND
   Future<void> fetchAssignments() async {
     try {
-      final response = await http.get(
-        Uri.parse("http://10.0.2.2:5000/api/assignments"),
-      );
-
-      if (response.statusCode == 200) {
-        setState(() {
-          assignments = jsonDecode(response.body);
-        });
-      } else {
-        print("Failed to load assignments");
-      }
+      final data = await ApiService.getAssignments();
+      setState(() {
+        assignments = data;
+      });
     } catch (e) {
       print("Error fetching assignments: $e");
     }
@@ -66,19 +58,15 @@ class _TeacherUploadAssignmentState extends State<TeacherUploadAssignment> {
     }
 
     try {
-      final response = await http.post(
-        Uri.parse("http://10.0.2.2:5000/api/assignments/add"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "semester": selectedSemester,
-          "subject": selectedSubject,
-          "assignment_title": titleController.text,
-          "description": descController.text,
-          "due_date": dueDate!.toIso8601String().split("T")[0],
-        }),
+      final ok = await ApiService.addAssignment(
+        semester: selectedSemester,
+        subject: selectedSubject,
+        title: titleController.text,
+        description: descController.text,
+        dueDate: dueDate!.toIso8601String().split("T")[0],
       );
 
-      if (response.statusCode == 201) {
+      if (ok) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Assignment saved to database")),
         );

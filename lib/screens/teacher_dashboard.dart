@@ -7,6 +7,7 @@ import 'teacher_attendance.dart';
 import 'teacher_marks.dart';
 import 'teacher_timetable.dart';
 import 'teacher_announcements.dart';
+import 'teacher_live_data.dart';
 
 class TeacherDashboard extends StatelessWidget {
   const TeacherDashboard({super.key});
@@ -71,6 +72,12 @@ class TeacherDashboard extends StatelessWidget {
               title: "Announcements",
               subtitle: "Post notices",
               page: TeacherAnnouncements(),
+            ),
+            _DashboardTile(
+              icon: Icons.sync,
+              title: "Live Data",
+              subtitle: "Check DB sync",
+              page: TeacherLiveData(),
             ),
           ],
         ),

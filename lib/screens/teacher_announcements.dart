@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+
+import '../services/api_service.dart';
 
 class TeacherAnnouncements extends StatefulWidget {
   const TeacherAnnouncements({super.key});
@@ -14,34 +14,27 @@ class _TeacherAnnouncementsState extends State<TeacherAnnouncements> {
 
   final titleController = TextEditingController();
   final messageController = TextEditingController();
+  bool posting = false;
 
   Future<void> postAnnouncement() async {
-    if (titleController.text.isEmpty ||
-        messageController.text.isEmpty) {
+    if (titleController.text.isEmpty || messageController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Fill all fields")),
       );
       return;
     }
 
+    setState(() => posting = true);
     try {
-      final response = await http.post(
-        Uri.parse("http://10.0.2.2:5000/api/announcement/add"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "announcement_title": titleController.text,
-          "message": messageController.text,
-        }),
+      final ok = await ApiService.addAnnouncement(
+        titleController.text.trim(),
+        messageController.text.trim(),
       );
 
-      print("STATUS CODE: ${response.statusCode}");
-      print("BODY: ${response.body}");
-
-      if (response.statusCode == 201) {
+      if (ok) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Announcement posted successfully")),
         );
-
         titleController.clear();
         messageController.clear();
       } else {
@@ -49,11 +42,12 @@ class _TeacherAnnouncementsState extends State<TeacherAnnouncements> {
           const SnackBar(content: Text("Failed to post announcement")),
         );
       }
-    } catch (e) {
-      print("Error: $e");
+    } catch (_) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Server connection error")),
       );
+    } finally {
+      if (mounted) setState(() => posting = false);
     }
   }
 
@@ -72,22 +66,18 @@ class _TeacherAnnouncementsState extends State<TeacherAnnouncements> {
           children: [
             TextField(
               controller: titleController,
-              decoration: const InputDecoration(
-                labelText: "Announcement Title",
-              ),
+              decoration: const InputDecoration(labelText: "Announcement Title"),
             ),
             const SizedBox(height: 20),
             TextField(
               controller: messageController,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: "Message",
-              ),
+              decoration: const InputDecoration(labelText: "Message"),
             ),
             const SizedBox(height: 30),
             ElevatedButton(
-              onPressed: postAnnouncement,
-              child: const Text("Post Announcement"),
+              onPressed: posting ? null : postAnnouncement,
+              child: Text(posting ? "Posting..." : "Post Announcement"),
             ),
           ],
         ),
