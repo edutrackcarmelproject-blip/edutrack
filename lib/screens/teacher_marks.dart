@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import '../services/api_service.dart';
 
 class TeacherMarks extends StatefulWidget {
   const TeacherMarks({super.key});
@@ -12,15 +11,18 @@ class TeacherMarks extends StatefulWidget {
 }
 
 class _TeacherMarksState extends State<TeacherMarks> {
-  String selectedSemester = "Sem 3";
+  String selectedSemester = "S3";
   String selectedSubject = "Data Structures";
 
-  final List<String> semesters = ["Sem 1", "Sem 3", "Sem 5"];
+  final List<String> semesters = ["S1", "S2", "S3", "S4", "S5", "S6"];
 
   final Map<String, List<String>> subjectsBySemester = {
-    "Sem 1": ["Maths", "Physics"],
-    "Sem 3": ["Data Structures", "Operating Systems"],
-    "Sem 5": ["DBMS", "Computer Networks"],
+    "S1": ["Maths I", "Physics"],
+    "S2": ["Maths II", "Electronics"],
+    "S3": ["Data Structures", "OOPS"],
+    "S4": ["DBMS", "Operating Systems"],
+    "S5": ["Computer Networks", "AI"],
+    "S6": ["Web Programming", "ML"],
   };
 
   final List<Map<String, dynamic>> students = [
@@ -41,19 +43,13 @@ class _TeacherMarksState extends State<TeacherMarks> {
       };
     }).toList();
 
-    final response = await http.post(
-      Uri.parse("http://10.0.2.2:5000/api/marks"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "semester": selectedSemester,
-        "subject": selectedSubject,
-        "marksList": marksList
-      }),
+    final ok = await ApiService.saveMarks(
+      semester: selectedSemester,
+      subject: selectedSubject,
+      marksList: marksList,
     );
 
-    print(response.body);
-
-    if (response.statusCode == 200) {
+    if (ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Marks saved successfully")),
       );

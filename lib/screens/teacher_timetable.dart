@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import '../services/api_service.dart';
 
 class TeacherTimetable extends StatefulWidget {
 const TeacherTimetable({super.key});
@@ -12,15 +11,15 @@ State<TeacherTimetable> createState() => _TeacherTimetableState();
 
 class _TeacherTimetableState extends State<TeacherTimetable> {
 
-String selectedSemester = "Sem 1";
+String selectedSemester = "S1";
 
 final List<String> semesters = [
-"Sem 1",
-"Sem 2",
-"Sem 3",
-"Sem 4",
-"Sem 5",
-"Sem 6"
+"S1",
+"S2",
+"S3",
+"S4",
+"S5",
+"S6"
 ];
 
 final TextEditingController subjectController = TextEditingController();
@@ -43,18 +42,14 @@ return;
 
 try {
 
-final response = await http.post(
-  Uri.parse("http://10.0.2.2:5000/api/timetable/add"),
-  headers: {"Content-Type": "application/json"},
-  body: jsonEncode({
-    "semester": selectedSemester,
-    "subject": subjectController.text,
-    "day": dayController.text,
-    "time": timeController.text,
-  }),
+final ok = await ApiService.addTimetable(
+  semester: selectedSemester,
+  subject: subjectController.text,
+  day: dayController.text,
+  time: timeController.text,
 );
 
-if (response.statusCode == 200) {
+if (ok) {
 
 setState(() {
 timetableList.add({

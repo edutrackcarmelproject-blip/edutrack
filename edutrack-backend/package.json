@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "check": "node --check index.js && node --check config/db.js && node --check middleware/authmiddleware.js && node --check controllers/authcontroller.js && node --check controllers/admincontroller.js && node --check controllers/teachercontroller.js && node --check controllers/studentcontroller.js && node --check routers/authrouters.js && node --check routers/adminrouters.js && node --check routers/teacherrouters.js && node --check routers/studentrouters.js"
   },
   "keywords": [],
   "author": "",

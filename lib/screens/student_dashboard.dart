@@ -10,6 +10,7 @@ import 'student_announcements.dart';
 import 'student_profile.dart';
 import 'student_chatbot_screen.dart';
 import 'student_speech_screen.dart';
+import 'student_live_data.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -107,6 +108,12 @@ class _StudentDashboardState extends State<StudentDashboard> {
               title: "Speech Input",
               subtitle: "Talk instead of typing",
               page: const StudentSpeechScreen(),
+            ),
+            _dashboardTile(
+              icon: Icons.sync,
+              title: "Live Sync",
+              subtitle: "Check DB data",
+              page: const StudentLiveData(),
             ),
           ],
         ),

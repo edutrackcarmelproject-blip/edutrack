@@ -1,4 +1,4 @@
-const announcementModel = require("../models/announcementModel");
+const announcementModel = require("../models/announcementmodel");
 
 // POST - Add Announcement
 exports.addAnnouncement = (req, res) => {
