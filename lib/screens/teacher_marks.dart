@@ -11,15 +11,18 @@ class TeacherMarks extends StatefulWidget {
 }
 
 class _TeacherMarksState extends State<TeacherMarks> {
-  String selectedSemester = "Sem 3";
+  String selectedSemester = "S3";
   String selectedSubject = "Data Structures";
 
-  final List<String> semesters = ["Sem 1", "Sem 3", "Sem 5"];
+  final List<String> semesters = ["S1", "S2", "S3", "S4", "S5", "S6"];
 
   final Map<String, List<String>> subjectsBySemester = {
-    "Sem 1": ["Maths", "Physics"],
-    "Sem 3": ["Data Structures", "Operating Systems"],
-    "Sem 5": ["DBMS", "Computer Networks"],
+    "S1": ["Maths I", "Physics"],
+    "S2": ["Maths II", "Electronics"],
+    "S3": ["Data Structures", "OOPS"],
+    "S4": ["DBMS", "Operating Systems"],
+    "S5": ["Computer Networks", "AI"],
+    "S6": ["Web Programming", "ML"],
   };
 
   final List<Map<String, dynamic>> students = [

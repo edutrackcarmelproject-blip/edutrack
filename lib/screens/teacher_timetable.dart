@@ -11,15 +11,15 @@ State<TeacherTimetable> createState() => _TeacherTimetableState();
 
 class _TeacherTimetableState extends State<TeacherTimetable> {
 
-String selectedSemester = "Sem 1";
+String selectedSemester = "S1";
 
 final List<String> semesters = [
-"Sem 1",
-"Sem 2",
-"Sem 3",
-"Sem 4",
-"Sem 5",
-"Sem 6"
+"S1",
+"S2",
+"S3",
+"S4",
+"S5",
+"S6"
 ];
 
 final TextEditingController subjectController = TextEditingController();
