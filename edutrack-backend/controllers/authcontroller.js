@@ -1,13 +1,10 @@
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
-codex/fix-high-priority-issues-from-codex-review
-const { hashPassword, verifyPassword } = require("../utils/password");
-
 
 codex/assist-with-backend-implementation-zaxooy
 const hashPassword = (password) =>
   crypto.createHash("sha256").update(password).digest("hex");
-codex/assist-with-backend-implementation-zaxooy
 
 const query = (sql, params = []) =>
   new Promise((resolve, reject) => {
@@ -19,18 +16,14 @@ const query = (sql, params = []) =>
 
 exports.login = async (req, res) => {
   try {
-    const { email, username, password } = req.body;
-    const credential = (email || username || "").trim();
-    if (!credential || !password) {
-      return res.status(400).json({ success: false, message: "username/email and password are required" });
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: "email and password are required" });
     }
 
     const rows = await query(
-      `SELECT id, name, email, username, password_hash, role, is_approved, semester, admission_no
-       FROM users
-       WHERE email = ? OR username = ?
-       LIMIT 1`,
-      [credential, credential]
+      "SELECT id, name, email, password_hash, role, is_approved FROM users WHERE email = ?",
+      [email]
     );
 
     if (rows.length === 0) {
@@ -38,7 +31,7 @@ exports.login = async (req, res) => {
     }
 
     const user = rows[0];
-    if (!verifyPassword(password, user.password_hash)) {
+    if (user.password_hash !== hashPassword(password)) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
@@ -47,9 +40,6 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
- codex/fix-high-priority-issues-from-codex-review
-      { id: user.id, role: user.role, email: user.email, username: user.username },
-
       { id: user.id, role: user.role, email: user.email },
 
 
@@ -128,7 +118,6 @@ exports.login = (req, res) => {
         role: user.role
       },
 main
-codex/assist-with-backend-implementation-zaxooy
       process.env.JWT_SECRET || "edutrack_secret",
       { expiresIn: "7d" }
     );
@@ -142,10 +131,7 @@ codex/assist-with-backend-implementation-zaxooy
           id: user.id,
           name: user.name,
           email: user.email,
-          username: user.username,
-          role: user.role,
-          semester: user.semester,
-          admission_no: user.admission_no
+          role: user.role
         }
       }
     });
@@ -156,49 +142,25 @@ codex/assist-with-backend-implementation-zaxooy
 
 exports.registerStudent = async (req, res) => {
   try {
-    const { name, email, username, password, semester, admission_no } = req.body;
-    if (!name || !email || !username || !password || !semester || !admission_no) {
-      return res.status(400).json({ success: false, message: "name, email, username, password, semester and admission_no are required" });
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, message: "name, email and password are required" });
     }
 
-    const exists = await query("SELECT id FROM users WHERE email = ? OR username = ?", [email, username]);
+    const exists = await query("SELECT id FROM users WHERE email = ?", [email]);
     if (exists.length > 0) {
-      return res.status(409).json({ success: false, message: "Email or username already exists" });
+      return res.status(409).json({ success: false, message: "Email already exists" });
     }
 
     const result = await query(
-      `INSERT INTO users (name, email, username, password_hash, role, is_approved, semester, admission_no)
-       VALUES (?, ?, ?, ?, 'student', 0, ?, ?)`,
-      [name, email, username, hashPassword(password), semester, admission_no]
+      "INSERT INTO users (name, email, password_hash, role, is_approved) VALUES (?, ?, ?, 'student', 0)",
+      [name, email, hashPassword(password)]
     );
 
     return res.status(201).json({
       success: true,
-      data: { id: result.insertId, name, email, username, role: "student", semester, admission_no, is_approved: 0 }
+      data: { id: result.insertId, name, email, role: "student", is_approved: 0 }
     });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: "Database error" });
-  }
-};
-
-exports.changePassword = async (req, res) => {
-  try {
-    const { current_password, new_password } = req.body;
-    if (!current_password || !new_password) {
-      return res.status(400).json({ success: false, message: "current_password and new_password are required" });
-    }
-
-    const rows = await query("SELECT password_hash FROM users WHERE id = ?", [req.user.id]);
-    if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
-    if (!verifyPassword(current_password, rows[0].password_hash)) {
-      return res.status(401).json({ success: false, message: "Current password is incorrect" });
-    }
-
-    await query("UPDATE users SET password_hash = ? WHERE id = ?", [hashPassword(new_password), req.user.id]);
-    return res.status(200).json({ success: true, message: "Password updated" });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Database error" });
   }
@@ -207,8 +169,7 @@ exports.changePassword = async (req, res) => {
 exports.me = async (req, res) => {
   try {
     const rows = await query(
-      `SELECT id, name, email, username, role, is_approved, semester, admission_no, created_at
-       FROM users WHERE id = ?`,
+      "SELECT id, name, email, role, is_approved, created_at FROM users WHERE id = ?",
       [req.user.id]
     );
 

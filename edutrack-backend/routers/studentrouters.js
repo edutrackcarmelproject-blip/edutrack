@@ -6,7 +6,6 @@ const { verifyToken, requireRole } = require("../middleware/authmiddleware");
 
 router.use(verifyToken, requireRole("student"));
 
-router.get("/subjects", studentController.getSubjects);
 router.get("/announcements", studentController.getAnnouncements);
 router.get("/assignments", studentController.getAssignments);
 router.get("/attendance", studentController.getAttendance);
