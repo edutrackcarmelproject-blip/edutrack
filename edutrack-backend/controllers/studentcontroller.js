@@ -8,10 +8,14 @@ const query = (sql, params = []) =>
     });
   });
 
+ codex/fix-high-priority-issues-from-codex-review
 const parseFilters = async (req) => {
   const studentRows = await query("SELECT semester FROM users WHERE id = ? AND role = 'student'", [req.user.id]);
   const defaultSemester = studentRows.length ? studentRows[0].semester : null;
 
+
+const parseFilters = (req) => {
+ codex/assist-with-backend-implementation-zaxooy
   const studentId = Number(req.user.id);
   const subjectId = req.query.subject_id ? Number(req.query.subject_id) : null;
   const semester = req.query.semester || defaultSemester || null;
