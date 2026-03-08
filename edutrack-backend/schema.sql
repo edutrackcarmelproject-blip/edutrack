@@ -2,6 +2,7 @@ CREATE DATABASE IF NOT EXISTS edutrack;
 USE edutrack;
 
 CREATE TABLE IF NOT EXISTS users (
+ codex/assist-with-backend-implementation-zaxooy
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(120) NOT NULL,
   email VARCHAR(180) NOT NULL UNIQUE,
@@ -106,3 +107,68 @@ VALUES
 (2, 1),
 (2, 2),
 (3, 3);
+
+  user_id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  role ENUM('student','teacher','admin') NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS announcement (
+  announcement_id INT PRIMARY KEY AUTO_INCREMENT,
+  announcement_title VARCHAR(200) NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS assignments (
+  assignment_id INT PRIMARY KEY AUTO_INCREMENT,
+  semester VARCHAR(50) NOT NULL,
+  subject VARCHAR(100) NOT NULL,
+  assignment_title VARCHAR(200) NOT NULL,
+  description TEXT NOT NULL,
+  due_date DATE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS attendance (
+  attendance_id INT PRIMARY KEY AUTO_INCREMENT,
+  attendance_date DATE NOT NULL,
+  semester VARCHAR(50) NOT NULL,
+  subject VARCHAR(100) NOT NULL,
+  present_students JSON NOT NULL,
+  absent_students JSON NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS marks (
+  mark_id INT PRIMARY KEY AUTO_INCREMENT,
+  student_name VARCHAR(150) NOT NULL,
+  semester VARCHAR(50) NOT NULL,
+  subject VARCHAR(100) NOT NULL,
+  marks DECIMAL(5,2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS timetable (
+  timetable_id INT PRIMARY KEY AUTO_INCREMENT,
+  semester VARCHAR(50) NOT NULL,
+  subject VARCHAR(100) NOT NULL,
+  day VARCHAR(20) NOT NULL,
+  time VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS assignment_grades (
+  assignment_grade_id INT PRIMARY KEY AUTO_INCREMENT,
+  semester VARCHAR(50) NOT NULL,
+  subject VARCHAR(100) NOT NULL,
+  assignment VARCHAR(200) NOT NULL,
+  student VARCHAR(150) NOT NULL,
+  marks DECIMAL(5,2) NOT NULL,
+  feedback TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+main

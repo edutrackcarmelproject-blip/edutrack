@@ -3,8 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+ codex/assist-with-backend-implementation-zaxooy
     "start": "node index.js",
     "check": "node --check index.js && node --check config/db.js && node --check middleware/authmiddleware.js && node --check controllers/authcontroller.js && node --check controllers/admincontroller.js && node --check controllers/teachercontroller.js && node --check controllers/studentcontroller.js && node --check controllers/dashboardcontroller.js && node --check routers/authrouters.js && node --check routers/adminrouters.js && node --check routers/teacherrouters.js && node --check routers/studentrouters.js && node --check routers/dashboardrouters.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "check": "node --check index.js && node --check controllers/authcontroller.js && node --check controllers/announcementcontroller.js && node --check controllers/assignmentcontroller.js && node --check controllers/attendancecontroller.js && node --check controllers/markscontroller.js && node --check controllers/assignmentmarkscontroller.js && node --check controllers/dashboardcontroller.js && node --check routers/authrouters.js && node --check routers/dashboardrouters.js && node --check routers/announcementrouters.js && node --check routers/assignmentrouters.js && node --check routers/attendancerouters.js && node --check routers/marksrouters.js && node --check routers/timetablerouters.js && node --check routers/assignmentmarkrouters.js"
+main
   },
   "keywords": [],
   "author": "",
