@@ -12,21 +12,35 @@ class ApiService {
       Uri.parse('$baseUrl$path').replace(queryParameters: query);
 
   static Future<List<dynamic>> getAnnouncements() async {
-    final response = await http.get(_uri('/api/announcement'));
+    final response = await http.get(_uri('/api/student/announcements'));
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch announcements');
     }
-    return jsonDecode(response.body) as List<dynamic>;
+    final decoded = jsonDecode(response.body);
+    if (decoded is Map<String, dynamic> && decoded['data'] is List) {
+      return decoded['data'] as List<dynamic>;
+    }
+    return decoded as List<dynamic>;
   }
 
-  static Future<bool> addAnnouncement(String title, String message) async {
+  static Future<bool> addAnnouncement(
+    String title,
+    String message, {
+    int? subjectId,
+  }) async {
+    final body = <String, dynamic>{
+      'title': title,
+      'message': message,
+    };
+
+    if (subjectId != null) {
+      body['subject_id'] = subjectId;
+    }
+
     final response = await http.post(
-      _uri('/api/announcement/add'),
+      _uri('/api/announcements'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'announcement_title': title,
-        'message': message,
-      }),
+      body: jsonEncode(body),
     );
 
     return response.statusCode == 200 || response.statusCode == 201;
@@ -50,7 +64,11 @@ class ApiService {
       throw Exception('Failed to fetch assignments');
     }
 
-    return jsonDecode(response.body) as List<dynamic>;
+    final decoded = jsonDecode(response.body);
+    if (decoded is Map<String, dynamic> && decoded['data'] is List) {
+      return decoded['data'] as List<dynamic>;
+    }
+    return decoded as List<dynamic>;
   }
 
   static Future<bool> addAssignment({

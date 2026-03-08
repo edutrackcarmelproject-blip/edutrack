@@ -9,7 +9,7 @@ const query = (sql, params = []) =>
   });
 
 const parseFilters = (req) => {
-  const studentId = Number(req.query.student_id || req.user.id);
+  const studentId = Number(req.user.id);
   const subjectId = req.query.subject_id ? Number(req.query.subject_id) : null;
   const semester = req.query.semester || null;
   return { studentId, subjectId, semester };
