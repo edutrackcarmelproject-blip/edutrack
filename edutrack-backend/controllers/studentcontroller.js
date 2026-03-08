@@ -8,16 +8,40 @@ const query = (sql, params = []) =>
     });
   });
 
-const parseFilters = (req) => {
-  const studentId = Number(req.query.student_id || req.user.id);
+const parseFilters = async (req) => {
+  const studentRows = await query("SELECT semester FROM users WHERE id = ? AND role = 'student'", [req.user.id]);
+  const defaultSemester = studentRows.length ? studentRows[0].semester : null;
+
+  const studentId = Number(req.user.id);
   const subjectId = req.query.subject_id ? Number(req.query.subject_id) : null;
-  const semester = req.query.semester || null;
+  const semester = req.query.semester || defaultSemester || null;
   return { studentId, subjectId, semester };
+};
+
+exports.getSubjects = async (req, res) => {
+  try {
+    const filters = await parseFilters(req);
+    if (!filters.semester) {
+      return res.status(200).json({ success: true, data: [] });
+    }
+
+    const rows = await query(
+      `SELECT id, subject_name, semester
+       FROM subjects
+       WHERE semester = ?
+       ORDER BY subject_name ASC`,
+      [filters.semester]
+    );
+
+    return res.status(200).json({ success: true, data: rows });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Database error" });
+  }
 };
 
 exports.getAnnouncements = async (req, res) => {
   try {
-    const { subjectId, semester } = parseFilters(req);
+    const { subjectId, semester } = await parseFilters(req);
 
     let sql = `SELECT a.id, a.title, a.message, a.created_at,
                       a.teacher_id, u.name AS teacher_name,
@@ -48,7 +72,7 @@ exports.getAnnouncements = async (req, res) => {
 
 exports.getAssignments = async (req, res) => {
   try {
-    const { subjectId, semester } = parseFilters(req);
+    const { subjectId, semester } = await parseFilters(req);
 
     let sql = `SELECT a.id, a.title, a.description, a.due_date, a.created_at,
                       a.teacher_id, u.name AS teacher_name,
@@ -79,10 +103,7 @@ exports.getAssignments = async (req, res) => {
 
 exports.getAttendance = async (req, res) => {
   try {
-    const { studentId, subjectId, semester } = parseFilters(req);
-    if (!studentId) {
-      return res.status(400).json({ success: false, message: "student_id is required" });
-    }
+    const { studentId, subjectId, semester } = await parseFilters(req);
 
     let sql = `SELECT at.id, at.student_id, at.subject_id, at.date, at.status,
                       s.subject_name, s.semester
@@ -111,10 +132,7 @@ exports.getAttendance = async (req, res) => {
 
 exports.getMarks = async (req, res) => {
   try {
-    const { studentId, subjectId, semester } = parseFilters(req);
-    if (!studentId) {
-      return res.status(400).json({ success: false, message: "student_id is required" });
-    }
+    const { studentId, subjectId, semester } = await parseFilters(req);
 
     let sql = `SELECT m.id, m.student_id, m.subject_id, m.exam_type, m.marks,
                       s.subject_name, s.semester
@@ -143,7 +161,7 @@ exports.getMarks = async (req, res) => {
 
 exports.getTimetable = async (req, res) => {
   try {
-    const { subjectId, semester } = parseFilters(req);
+    const { subjectId, semester } = await parseFilters(req);
 
     let sql = `SELECT t.id, t.day, t.start_time, t.end_time,
                       t.subject_id, s.subject_name, s.semester,
