@@ -7,6 +7,8 @@ const authRouter = require("./routers/authrouters");
 const adminRouter = require("./routers/adminrouters");
 const teacherRouter = require("./routers/teacherrouters");
 const studentRouter = require("./routers/studentrouters");
+ codex/fix-high-priority-issues-from-codex-review
+
 const assignmentRoutes = require("./routers/assignmentrouters");
 const announcementRoutes = require("./routers/announcementrouters");
 const attendanceRouters = require("./routers/attendancerouters");
@@ -15,6 +17,7 @@ const timetableRouter = require("./routers/timetablerouters");
 const assignmentMarksRouter = require("./routers/assignmentmarkrouters");
 const authRouter = require("./routers/authrouters");
  main
+ codex/assist-with-backend-implementation-zaxooy
 const dashboardRouter = require("./routers/dashboardrouters");
 
 const app = express();
