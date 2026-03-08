@@ -2,16 +2,11 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-codex/fix-high-priority-issues-from-codex-review
-import '../auth_storage.dart';
-
-
  codex/assist-with-backend-implementation-zaxooy
 import '../auth_storage.dart';
 
 
  main
- codex/assist-with-backend-implementation-zaxooy
 class ApiService {
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
@@ -223,100 +218,22 @@ codex/assist-with-backend-implementation-zaxooy
 
 
 
-  static Future<Map<String, String>> _jsonHeaders({bool auth = true}) async {
-    final headers = <String, String>{'Content-Type': 'application/json'};
-    if (!auth) return headers;
-
-    final token = await AuthStorage.getToken();
-    if (token != null && token.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $token';
-    }
-
-    return headers;
-  }
-
-  static List<dynamic> _decodeListResponse(String body) {
-    final decoded = jsonDecode(body);
-    if (decoded is Map<String, dynamic> && decoded['data'] is List) {
-      return decoded['data'] as List<dynamic>;
-    }
-    return decoded as List<dynamic>;
-  }
-
-  
-  static Future<Map<String, dynamic>> login({
-    required String usernameOrEmail,
-    required String password,
-  }) async {
-    final response = await http.post(
-      _uri('/api/auth/login'),
-      headers: await _jsonHeaders(auth: false),
-      body: jsonEncode({'email': usernameOrEmail, 'password': password}),
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception('Login failed');
-    }
-
-    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-    final data = decoded['data'] as Map<String, dynamic>? ?? {};
-    final token = data['token']?.toString();
-    final user = data['user'] as Map<String, dynamic>? ?? {};
-    final role = user['role']?.toString() ?? '';
-    if (token != null && token.isNotEmpty && role.isNotEmpty) {
-      await AuthStorage.saveAuth(token, role);
-    }
-    return decoded;
-  }
-
-  static Future<void> changePassword({
-    required String currentPassword,
-    required String newPassword,
-  }) async {
-    final response = await http.post(
-      _uri('/api/auth/change-password'),
-      headers: await _jsonHeaders(),
-      body: jsonEncode({
-        'current_password': currentPassword,
-        'new_password': newPassword,
-      }),
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to change password');
-    }
-  }
-static Future<List<dynamic>> getAnnouncements() async {
-    final response = await http.get(
-      _uri('/api/student/announcements'),
-      headers: await _jsonHeaders(),
-    );
-
+  static Future<List<dynamic>> getAnnouncements() async {
+    final response = await http.get(_uri('/api/announcement'));
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch announcements');
     }
-
-    return _decodeListResponse(response.body);
+    return jsonDecode(response.body) as List<dynamic>;
   }
 
-  static Future<bool> addAnnouncement(
-    String title,
-    String message, {
-    int? subjectId,
-  }) async {
-    final body = <String, dynamic>{
-      'title': title,
-      'message': message,
-    };
-
-    if (subjectId != null) {
-      body['subject_id'] = subjectId;
-    }
-
+  static Future<bool> addAnnouncement(String title, String message) async {
     final response = await http.post(
-      _uri('/api/announcements'),
-      headers: await _jsonHeaders(),
-      body: jsonEncode(body),
+      _uri('/api/announcement/add'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'announcement_title': title,
+        'message': message,
+      }),
     );
 
     return response.statusCode == 200 || response.statusCode == 201;
@@ -334,16 +251,13 @@ static Future<List<dynamic>> getAnnouncements() async {
       query['subject'] = subject;
     }
 
-    final response = await http.get(
-      _uri(path, query.isEmpty ? null : query),
-      headers: await _jsonHeaders(),
-    );
+    final response = await http.get(_uri(path, query.isEmpty ? null : query));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch assignments');
     }
 
-    return _decodeListResponse(response.body);
+    return jsonDecode(response.body) as List<dynamic>;
   }
 
   static Future<bool> addAssignment({
@@ -355,7 +269,7 @@ static Future<List<dynamic>> getAnnouncements() async {
   }) async {
     final response = await http.post(
       _uri('/api/assignments/add'),
-      headers: await _jsonHeaders(),
+      headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'semester': semester,
         'subject': subject,
@@ -377,7 +291,7 @@ static Future<List<dynamic>> getAnnouncements() async {
   }) async {
     final response = await http.post(
       _uri('/api/attendance'),
-      headers: await _jsonHeaders(),
+      headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'attendance_date': attendanceDate,
         'semester': semester,
@@ -397,7 +311,7 @@ static Future<List<dynamic>> getAnnouncements() async {
   }) async {
     final response = await http.post(
       _uri('/api/marks'),
-      headers: await _jsonHeaders(),
+      headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'semester': semester,
         'subject': subject,
@@ -416,7 +330,7 @@ static Future<List<dynamic>> getAnnouncements() async {
   }) async {
     final response = await http.post(
       _uri('/api/timetable/add'),
-      headers: await _jsonHeaders(),
+      headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'semester': semester,
         'subject': subject,
@@ -428,17 +342,15 @@ static Future<List<dynamic>> getAnnouncements() async {
     return response.statusCode == 200 || response.statusCode == 201;
   }
 
+
   static Future<Map<String, dynamic>> getTeacherDashboard({
     required String semester,
     required String subject,
   }) async {
-    final response = await http.get(
-      _uri('/api/dashboard/teacher', {
-        'semester': semester,
-        'subject': subject,
-      }),
-      headers: await _jsonHeaders(),
-    );
+    final response = await http.get(_uri('/api/dashboard/teacher', {
+      'semester': semester,
+      'subject': subject,
+    }));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch teacher dashboard');
@@ -452,14 +364,11 @@ static Future<List<dynamic>> getAnnouncements() async {
     required String subject,
     required String studentName,
   }) async {
-    final response = await http.get(
-      _uri('/api/dashboard/student', {
-        'semester': semester,
-        'subject': subject,
-        'student_name': studentName,
-      }),
-      headers: await _jsonHeaders(),
-    );
+    final response = await http.get(_uri('/api/dashboard/student', {
+      'semester': semester,
+      'subject': subject,
+      'student_name': studentName,
+    }));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch student dashboard');
