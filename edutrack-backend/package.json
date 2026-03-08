@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "check": "node --check index.js && node --check config/db.js && node --check middleware/authmiddleware.js && node --check controllers/authcontroller.js && node --check controllers/admincontroller.js && node --check controllers/teachercontroller.js && node --check controllers/studentcontroller.js && node --check routers/authrouters.js && node --check routers/adminrouters.js && node --check routers/teacherrouters.js && node --check routers/studentrouters.js"
+    "check": "node --check index.js && node --check config/db.js && node --check middleware/authmiddleware.js && node --check controllers/authcontroller.js && node --check controllers/admincontroller.js && node --check controllers/teachercontroller.js && node --check controllers/studentcontroller.js && node --check controllers/dashboardcontroller.js && node --check routers/authrouters.js && node --check routers/adminrouters.js && node --check routers/teacherrouters.js && node --check routers/studentrouters.js && node --check routers/dashboardrouters.js"
   },
   "keywords": [],
   "author": "",
