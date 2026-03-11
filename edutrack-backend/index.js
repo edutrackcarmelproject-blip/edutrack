@@ -6,6 +6,7 @@ const authRouter = require("./routers/authrouters");
 const adminRouter = require("./routers/adminrouters");
 const teacherRouter = require("./routers/teacherrouters");
 const studentRouter = require("./routers/studentrouters");
+const dashboardRouter = require("./routers/dashboardrouters");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/student", studentRouter);
 app.use("/api", teacherRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: "Route not found" });

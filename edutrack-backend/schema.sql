@@ -5,11 +5,18 @@ CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(120) NOT NULL,
   email VARCHAR(180) NOT NULL UNIQUE,
+  username VARCHAR(120) NULL UNIQUE,
+  admission_no VARCHAR(64) NULL UNIQUE,
+  semester VARCHAR(20) NULL,
   password_hash VARCHAR(255) NOT NULL,
   role ENUM('admin','teacher','student') NOT NULL,
   is_approved TINYINT(1) NOT NULL DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(120) NULL UNIQUE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS admission_no VARCHAR(64) NULL UNIQUE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS semester VARCHAR(20) NULL;
 
 CREATE TABLE IF NOT EXISTS subjects (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -86,23 +93,27 @@ CREATE TABLE IF NOT EXISTS timetable (
   CONSTRAINT fk_tt_teacher FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Seed users (password = 1234)
-INSERT IGNORE INTO users (id, name, email, password_hash, role, is_approved)
+-- Legacy seed users (password = 1234, sha256 for backward compatibility)
+INSERT IGNORE INTO users (id, name, email, username, admission_no, semester, password_hash, role, is_approved)
 VALUES
-(1, 'Admin User', 'admin@edutrack.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'admin', 1),
-(2, 'Teacher One', 'teacher1@edutrack.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'teacher', 1),
-(3, 'Teacher Two', 'teacher2@edutrack.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'teacher', 1),
-(4, 'Student One', 'student1@edutrack.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'student', 1),
-(5, 'Student Two', 'student2@edutrack.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'student', 0);
+(1, 'Admin User', 'admin@edutrack.com', 'admin', NULL, NULL, '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'admin', 1),
+(2, 'Teacher One', 'teacher1@edutrack.com', 'teacher1', NULL, NULL, '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'teacher', 1),
+(3, 'Teacher Two', 'teacher2@edutrack.com', 'teacher2', NULL, NULL, '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'teacher', 1),
+(4, 'Student One', 'student1@edutrack.com', 'student1', 'S1-001', 'S1', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'student', 1),
+(5, 'Student Two', 'student2@edutrack.com', 'student2', 'S2-001', 'S2', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'student', 1);
 
 INSERT IGNORE INTO subjects (id, subject_name, semester)
 VALUES
 (1, 'Data Structures', 'S3'),
 (2, 'DBMS', 'S4'),
-(3, 'Computer Networks', 'S5');
+(3, 'Computer Networks', 'S5'),
+(4, 'Maths I', 'S1'),
+(5, 'Maths II', 'S2');
 
 INSERT IGNORE INTO teacher_subjects (teacher_id, subject_id)
 VALUES
 (2, 1),
 (2, 2),
-(3, 3);
+(3, 3),
+(2, 4),
+(3, 5);
